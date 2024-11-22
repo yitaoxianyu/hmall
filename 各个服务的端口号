@@ -1,0 +1,5 @@
+item-service : 8081/8083
+cart-service : 8082
+user-service : 8084
+trade-service : 8085
+pay-service : 8086

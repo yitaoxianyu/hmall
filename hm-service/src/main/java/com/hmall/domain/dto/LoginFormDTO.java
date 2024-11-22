@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @ApiModel(description = "登录表单实体")
 public class LoginFormDTO {
     @ApiModelProperty(value = "用户名", required = true)
+    //这里和validated注解搭配使用
     @NotNull(message = "用户名不能为空")
     private String username;
     @NotNull(message = "密码不能为空")
