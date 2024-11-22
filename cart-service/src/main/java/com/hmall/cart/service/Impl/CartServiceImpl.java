@@ -1,36 +1,31 @@
 package com.hmall.cart.service.Impl;
 
-import cn.hutool.core.util.RandomUtil;
+
 import cn.hutool.core.util.StrUtil;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmall.api.client.ItemClient;
+import com.hmall.api.dto.ItemDTO;
 import com.hmall.cart.domain.dto.CartFormDTO;
-import com.hmall.cart.domain.dto.ItemDTO;
 import com.hmall.cart.domain.po.Cart;
 import com.hmall.cart.domain.vo.CartVO;
 import com.hmall.cart.mapper.CartMapper;
 import com.hmall.cart.service.ICartService;
+import com.hmall.common.exception.BadRequestException;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.CollUtils;
 import com.hmall.common.utils.UserContext;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
 import java.util.List;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -45,12 +40,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
 
-    private final RestTemplate restTemplate;
+    private ItemClient itemClient;
 
     //注意这里不能使用static关键字修饰，ioc容器只会对成员变量进行注入
     private final DiscoveryClient discoveryClient;
 
-//    todo 远程调用
 //    private final IItemService itemService;
 
     @Override
@@ -93,30 +87,14 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 4.返回
         return vos;
     }
-
+    //openfeign底层为Client来实现的，默认的Client每次调用都会创建连接，所以要引入拥有连接池的Client
     private void handleCartItems(List<CartVO> vos) {
         // 1.获取商品id
         Set<Long> itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
-        // 2.查询商品
-        List<ServiceInstance> instances = discoveryClient.getInstances("item-service");
-        if(CollUtils.isEmpty(instances)) return ;
 
-        ServiceInstance instance = instances.get(RandomUtil.randomInt(instances.size()));
-        ResponseEntity<List<ItemDTO>> response = restTemplate.exchange(
-                instance.getUri() + "/item?ids={ids}",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<ItemDTO>>() {
-                },
-                Map.of("ids", StrUtil.join(",", itemIds))
-        );
+        List<ItemDTO> itemDTOS = itemClient.queryItemByIds(itemIds);
 
-        if(!response.getStatusCode().is2xxSuccessful()) return ;
-
-        List<ItemDTO> body = response.getBody();
-        if(CollUtils.isEmpty(body)) return ;
-
-
+        if(CollUtils.isEmpty(itemDTOS)) throw new BadRequestException("查询商品不存在");
     }
 
     @Override
