@@ -3,21 +3,22 @@ package com.hmall.pay.service.Impl;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmall.api.client.TradeClient;
+import com.hmall.api.client.UserClient;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.UserContext;
 import com.hmall.pay.domain.dto.PayApplyDTO;
 import com.hmall.pay.domain.dto.PayOrderFormDTO;
+import com.hmall.pay.domain.po.Order;
 import com.hmall.pay.domain.po.PayOrder;
 import com.hmall.pay.enums.PayStatus;
 import com.hmall.pay.mapper.PayOrderMapper;
 import com.hmall.pay.service.IPayOrderService;
-import com.hmall.service.IOrderService;
-import com.hmall.service.IUserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 
 /**
@@ -32,9 +33,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
 
-    private final IUserService userService;
+    private final UserClient userClient;
 
-    private final IOrderService orderService;
+    private final TradeClient tradeClient;
 
     @Override
     public String applyPayOrder(PayApplyDTO applyDTO) {
@@ -55,7 +56,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
             throw new BizIllegalException("交易已支付或关闭！");
         }
         // 3.尝试扣减余额
-        userService.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
+        userClient.deductMoney(payOrderFormDTO.getPw(), po.getAmount());
         // 4.修改支付单状态
         boolean success = markPayOrderSuccess(payOrderFormDTO.getId(), LocalDateTime.now());
         if (!success) {
@@ -66,7 +67,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         order.setId(po.getBizOrderNo());
         order.setStatus(2);
         order.setPayTime(LocalDateTime.now());
-        orderService.updateById(order);
+        tradeClient.markOrderPaySuccess(po.getPayOrderNo());
     }
 
     public boolean markPayOrderSuccess(Long id, LocalDateTime successTime) {

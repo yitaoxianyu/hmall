@@ -859,3 +859,13 @@ java.util.concurrent.TimeoutException: Waited 3000 milliseconds (plus 6 millisec
 22:10:34:845  WARN 29768 --- [nacos-grpc-client-executor-1817] c.a.n.c.remote.client.grpc.GrpcClient    : [1732277290396_192.168.200.1_51501]Ignore error event,isRunning:true,isAbandon=true
 22:10:36:455  INFO 29768 --- [nacos-grpc-client-executor-1821] com.alibaba.nacos.common.remote.client   : [2dd32d99-c884-4cf5-a9e8-6542865af8b6] Receive server push request, request = NotifySubscriberRequest, requestId = 25
 22:10:36:456  INFO 29768 --- [nacos-grpc-client-executor-1821] com.alibaba.nacos.common.remote.client   : [2dd32d99-c884-4cf5-a9e8-6542865af8b6] Ack server push request, request = NotifySubscriberRequest, requestId = 25
+22:28:48:602  WARN 29768 --- [Thread-4] c.a.nacos.common.notify.NotifyCenter     : [NotifyCenter] Start destroying Publisher
+22:28:48:603  WARN 29768 --- [Thread-7] c.a.n.common.http.HttpClientBeanHolder   : [HttpClientBeanHolder] Start destroying common HttpClient
+22:28:48:604  WARN 29768 --- [Thread-4] c.a.nacos.common.notify.NotifyCenter     : [NotifyCenter] Destruction of the end
+22:28:48:628  WARN 29768 --- [Thread-7] c.a.n.common.http.HttpClientBeanHolder   : [HttpClientBeanHolder] Destruction of the end
+22:28:49:087  INFO 29768 --- [SpringApplicationShutdownHook] c.a.c.n.registry.NacosServiceRegistry    : De-registering from Nacos Server now...
+22:28:49:252  INFO 29768 --- [SpringApplicationShutdownHook] c.a.c.n.registry.NacosServiceRegistry    : De-registration finished.
+22:28:49:584  INFO 29768 --- [SpringApplicationShutdownHook] com.alibaba.nacos.common.remote.client   : Shutdown rpc client, set status to shutdown
+22:28:49:584  INFO 29768 --- [SpringApplicationShutdownHook] com.alibaba.nacos.common.remote.client   : Shutdown client event executor java.util.concurrent.ScheduledThreadPoolExecutor@56fd8a6[Running, pool size = 2, active threads = 2, queued tasks = 0, completed tasks = 0]
+22:28:49:584  INFO 29768 --- [SpringApplicationShutdownHook] com.alibaba.nacos.common.remote.client   : Close current connection 1732284635688_192.168.200.1_65108
+22:28:49:589  INFO 29768 --- [SpringApplicationShutdownHook] c.a.n.c.remote.client.grpc.GrpcClient    : Shutdown grpc executor java.util.concurrent.ThreadPoolExecutor@562d473e[Running, pool size = 3, active threads = 0, queued tasks = 0, completed tasks = 2068]
