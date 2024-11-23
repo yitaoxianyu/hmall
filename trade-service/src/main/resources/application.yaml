@@ -42,7 +42,7 @@ knife4j:
         group-name: default
         api-rule: package
         api-rule-resources:
-          - com.hmall.item.controller
+          - com.hmall.trade.controller
 feign:
   okhttp:
     enabled: true

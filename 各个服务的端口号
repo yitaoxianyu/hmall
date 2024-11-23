@@ -1,3 +1,4 @@
+getaway-service : 8080
 item-service : 8081/8083
 cart-service : 8082
 user-service : 8084

@@ -16,7 +16,6 @@ com\hmall\mapper\ItemMapper.class
 com\hmall\domain\vo\CartVO.class
 com\hmall\service\impl\OrderLogisticsServiceImpl.class
 com\hmall\service\impl\OrderServiceImpl.class
-com\hmall\controller\SearchController.class
 com\hmall\domain\po\OrderLogistics.class
 com\hmall\service\impl\ItemServiceImpl.class
 com\hmall\service\IOrderService.class
@@ -62,5 +61,4 @@ com\hmall\controller\HelloController.class
 com\hmall\domain\dto\PayApplyDTO.class
 com\hmall\controller\OrderController.class
 com\hmall\mapper\OrderLogisticsMapper.class
-com\hmall\service\impl\CartServiceImpl.class
 com\hmall\controller\AddressController.class

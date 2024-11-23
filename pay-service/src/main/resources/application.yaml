@@ -38,7 +38,7 @@ knife4j:
         group-name: default
         api-rule: package
         api-rule-resources:
-          - com.hmall.controller
+          - com.hmall.pay.controller
 feign:
   okhttp:
     enabled: true

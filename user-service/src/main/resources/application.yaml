@@ -42,7 +42,7 @@ knife4j:
         group-name: default
         api-rule: package
         api-rule-resources:
-          - com.hmall.item.controller
+          - com.hmall.user.controller
 hm:
   jwt:
     location: classpath:hmall.jks
@@ -55,6 +55,3 @@ hm:
       - /users/login
       - /items/**
       - /hi
-feign:
-  okhttp:
-    enabled: true
