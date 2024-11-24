@@ -26,11 +26,11 @@ spring:
         - id : trade
           uri : lb://trade-service
           predicates:
-            -Path=/orders/**
+            - Path=/orders/**
         - id : pay
           uri : lb://pay-service
           predicates:
-            -Path=/pay-orders/**
+            - Path=/pay-orders/**
 mybatis-plus:
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
