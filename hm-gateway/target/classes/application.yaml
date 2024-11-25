@@ -1,6 +1,9 @@
 server:
   port: 8080
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   application:
     name: gateway
   profiles:
@@ -46,7 +49,7 @@ logging:
   file:
     path: "logs/${spring.application.name}"
 knife4j:
-  enable: true
+  enable : false
   openapi:
     title: 黑马商城用户管理接口文档
     description: "黑马商城用户管理接口文档"
