@@ -2,8 +2,17 @@ server:
   port: 8082
 
 feign:
+  sentinel:
+    enabled: true
   okhttp:
     enabled: true
+
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8090
+      http-method-specify: true
 
 hm:
   db:

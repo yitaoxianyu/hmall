@@ -1,6 +1,7 @@
     package com.hmall.api.config;
 
 
+    import com.hmall.api.client.fallback.ItemClientFallbackFactory;
     import com.hmall.common.utils.UserContext;
     import feign.RequestInterceptor;
     import feign.RequestTemplate;
@@ -20,5 +21,10 @@
                     requestTemplate.header("user-info",userId.toString());
                 }
             };
+        }
+
+        @Bean
+        public ItemClientFallbackFactory itemClientFallbackFactory(){
+            return new ItemClientFallbackFactory();
         }
     }

@@ -37,7 +37,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
 
         if(isExclude(request.getPath().toString())){
-            chain.filter(exchange);
+            return chain.filter(exchange);
         }
 
         String token = null;

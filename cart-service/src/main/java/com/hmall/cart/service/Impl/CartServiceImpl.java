@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
 
-    private ItemClient itemClient;
+    private final ItemClient itemClient;
 
     //注意这里不能使用static关键字修饰，ioc容器只会对成员变量进行注入
     private final DiscoveryClient discoveryClient;
@@ -87,6 +87,12 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 4.返回
         return vos;
     }
+
+    //当商品服务调用过慢并且在高并发场景下,tomcat的线程池会被占用玩此时如果其他服务调用购物车服务则也会被堵塞导致一系列的服务不能用叫做雪崩
+    //这里的购物车服务,会调用商品服务来查询商品信息当有高并发场景时,可能会产生雪崩解决方案有三种:
+    //一:使用qps流控,每次限制发送的请求,如果太多则轮流等待
+    //二:采用服务的线程隔离,即让这个接口只能使用一定数量的线程防止被这个服务占用完
+    //三:服务熔断机制,当慢查询比例过高时会直接不调用该服务,返回给用户设计好的fallback函数
     //openfeign底层为Client来实现的，默认的Client每次调用都会创建连接，所以要引入拥有连接池的Client
     private void handleCartItems(List<CartVO> vos) {
         // 1.获取商品id

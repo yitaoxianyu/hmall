@@ -47,7 +47,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         Assert.notNull(user, "用户名错误");
         // 3.校验是否禁用
         if (user.getStatus() == UserStatus.FROZEN) {
-            throw new ForbiddenException("用户被冻结");
+            throw new ForbiddenException("用户    被冻结");
         }
         // 4.校验密码
         if (!passwordEncoder.matches(password, user.getPassword())) {
