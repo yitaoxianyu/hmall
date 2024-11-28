@@ -13,6 +13,12 @@ spring:
       transport:
         dashboard: localhost:8090
       http-method-specify: true
+  rabbitmq:
+    host: 192.168.200.131
+    port: 5672
+    virtual-host: /
+    username: itheima
+    password: 123321
 
 hm:
   db:

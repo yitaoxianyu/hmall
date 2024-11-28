@@ -23,11 +23,5 @@ public class JsonConfig {
         };
     }
 
-    @Bean
-    public MessageConverter messageConverter(){
-        Jackson2JsonMessageConverter jackson2JsonMessageConverter = new Jackson2JsonMessageConverter();
-        jackson2JsonMessageConverter.setCreateMessageIds(true);
 
-        return jackson2JsonMessageConverter;
-    }
 }
