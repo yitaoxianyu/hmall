@@ -2,6 +2,8 @@ package com.hmall.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -19,5 +21,13 @@ public class JsonConfig {
             jacksonObjectMapperBuilder.serializerByType(Long.class, ToStringSerializer.instance);
             jacksonObjectMapperBuilder.serializerByType(BigInteger.class, ToStringSerializer.instance);
         };
+    }
+
+    @Bean
+    public MessageConverter messageConverter(){
+        Jackson2JsonMessageConverter jackson2JsonMessageConverter = new Jackson2JsonMessageConverter();
+        jackson2JsonMessageConverter.setCreateMessageIds(true);
+
+        return jackson2JsonMessageConverter;
     }
 }

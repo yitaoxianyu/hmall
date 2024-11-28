@@ -1,12 +1,14 @@
 server:
   port: 8082
 
+#openfeign开启sentinel，也就是可以将远程调用的接口显示出来
 feign:
   sentinel:
     enabled: true
   okhttp:
     enabled: true
 
+#这里是这个服务开启sentinel
 spring:
   cloud:
     sentinel:

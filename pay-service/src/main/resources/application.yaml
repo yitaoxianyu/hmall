@@ -1,3 +1,4 @@
+
 server:
   port: 8086
 spring:
@@ -10,6 +11,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ${hm.db.pw}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.200.131:8848
+  rabbitmq:
+    host: 192.168.200.131
+    port: 5672
+    virtual-host: /
+    username: itheima
+    password: 123321
 mybatis-plus:
   configuration:
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler

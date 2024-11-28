@@ -45,9 +45,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final GlobalTransactionScanner globalTransactionScanner;
 
 
-    //    这里的
+    //这里会出现事务的不一致性，当库存不足时，订单和构建库存操作会进行回滚，但是调用购物车的服务并不会进行回滚
     @Override
-    @Transactional
+    @Transactional //当抛出RuntimeException及其子类时，事务会进行回滚
     @GlobalTransactional
     public Long createOrder(OrderFormDTO orderFormDTO) {
         // 1.订单数据
