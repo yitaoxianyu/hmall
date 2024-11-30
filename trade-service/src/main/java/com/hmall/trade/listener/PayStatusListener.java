@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PayStatusListened {
+public class PayStatusListener {
 
     private final IOrderService orderService;
 
@@ -18,6 +18,7 @@ public class PayStatusListened {
     //queueName : trade.pay.success.queue
     //key : pay.success
 
+    //此时异步调用开启了另一个线程
     @RabbitListener(bindings = @QueueBinding(
             value = @Queue("trade.pay.success.queue"),
             exchange = @Exchange("pay.topic"),

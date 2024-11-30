@@ -17,6 +17,10 @@ import com.hmall.trade.service.IOrderService;
 import io.seata.spring.annotation.GlobalTransactionScanner;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -43,6 +47,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final IOrderDetailService detailService;
     private final CartClient cartClient;
     private final GlobalTransactionScanner globalTransactionScanner;
+    private final RabbitTemplate rabbitTemplate;
 
 
     //这里会出现事务的不一致性，当库存不足时，订单和构建库存操作会进行回滚，但是调用购物车的服务并不会进行回滚
@@ -81,7 +86,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         detailService.saveBatch(details);
 
         // 3.清理购物车商品
-        cartClient.deleteCartItemByIds(itemIds);
+        rabbitTemplate.convertAndSend("trade.topic", "order.create", itemIds,
+                new MessagePostProcessor() {
+                    @Override
+                    public Message postProcessMessage(Message message) throws AmqpException {
+                        message.getMessageProperties().setHeader("userId",UserContext.getUser());
+                        return message;
+                    }
+                }
+
+        );
 
         // 4.扣减库存
         try {
