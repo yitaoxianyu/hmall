@@ -17,7 +17,7 @@ spring:
 hm:
   db:
     host: 192.168.200.131
-    database: hm-cart
+    database: hm-item
     port: 3306
     un: root
     pw: 123

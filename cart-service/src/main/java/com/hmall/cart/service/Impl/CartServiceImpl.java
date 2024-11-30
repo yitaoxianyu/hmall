@@ -73,7 +73,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     @Override
     public List<CartVO> queryMyCarts() {
         // 1.查询我的购物车列表
-        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, 1L).list();
+        List<Cart> carts = lambdaQuery().eq(Cart::getUserId, UserContext.getUser()).list();
         if (CollUtils.isEmpty(carts)) {
             return CollUtils.emptyList();
         }
@@ -96,9 +96,9 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
     //openfeign底层为Client来实现的，默认的Client每次调用都会创建连接，所以要引入拥有连接池的Client
     private void handleCartItems(List<CartVO> vos) {
         // 1.获取商品id
-        Set<Long> itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
+        Set<Long> ids = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
 
-        List<ItemDTO> itemDTOS = itemClient.queryItemByIds(itemIds);
+        List<ItemDTO> itemDTOS = itemClient.queryItemByIds(ids);
 
         if(CollUtils.isEmpty(itemDTOS)) throw new BadRequestException("查询商品不存在");
     }
