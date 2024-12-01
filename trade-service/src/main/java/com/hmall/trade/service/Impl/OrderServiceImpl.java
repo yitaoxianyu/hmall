@@ -17,17 +17,20 @@ import com.hmall.trade.service.IOrderService;
 import io.seata.spring.annotation.GlobalTransactionScanner;
 import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.Correlation;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+
+import javax.validation.metadata.ConstructorDescriptor;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +43,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
 
@@ -85,6 +89,27 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         List<OrderDetail> details = buildDetails(order.getId(), items, itemNumMap);
         detailService.saveBatch(details);
 
+
+        //这里设置了消息发送之后的返回动作
+        CorrelationData cd = new CorrelationData(UUID.randomUUID().toString());
+        cd.getFuture().addCallback(new ListenableFutureCallback<CorrelationData.Confirm>() {
+            @Override
+            public void onFailure(Throwable ex) {
+                // 2.1.Future发生异常时的处理逻辑，基本不会触发
+                log.error("send message fail", ex);
+            }
+            @Override
+            public void onSuccess(CorrelationData.Confirm result) {
+                // 2.2.Future接收到回执的处理逻辑，参数中的result就是回执内容
+                if(result.isAck()){ // result.isAck()，boolean类型，true代表ack回执，false 代表 nack回执
+                    log.debug("发送消息成功，收到 ack!");
+                }else{ // result.getReason()，String类型，返回nack时的异常描述
+                    log.error("发送消息失败，收到 nack, reason : {}", result.getReason());
+                }
+            }
+        });
+
+
         // 3.清理购物车商品
         rabbitTemplate.convertAndSend("trade.topic", "order.create", itemIds,
                 new MessagePostProcessor() {
@@ -95,7 +120,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                     }
                 }
 
-        );
+        ,cd);
 
         // 4.扣减库存
         try {

@@ -8,6 +8,20 @@ feign:
     enabled: true
 
 spring:
+  rabbitmq:
+    connection-timeout: 1s
+    template:
+      retry:
+        enabled: true
+        initial-interval: 1000ms
+        multiplier: 1
+        max-attempts: 3
+
+    #这个用来设置生产者确认的消息
+    publisher-confirm-type: correlated
+    #这个用来设置发送消息的返回值
+    publisher-returns: true
+
   cloud:
     sentinel:
       transport:
@@ -17,10 +31,10 @@ spring:
 hm:
   db:
     host: 192.168.200.131
-    database: hm-cart
+    database: hm-trade
     port: 3306
     un: root
     pw: 123
   swagger:
     title: "黑马商城交易服务接口文档"
-    package: com.hmall.cart.controller
+    package: com.hmall.trade.controller
