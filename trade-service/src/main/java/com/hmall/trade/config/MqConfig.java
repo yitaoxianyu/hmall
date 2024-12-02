@@ -23,16 +23,13 @@ public class MqConfig {
 
     @PostConstruct
     public void init(){
-        rabbitTemplate.setReturnsCallback(new RabbitTemplate.ReturnsCallback() {
-            @Override
-            public void returnedMessage(ReturnedMessage returned) {
-                log.error("触发return callback,");
-                log.debug("exchange: {}", returned.getExchange());
-                log.debug("routingKey: {}", returned.getRoutingKey());
-                log.debug("message: {}", returned.getMessage());
-                log.debug("replyCode: {}", returned.getReplyCode());
-                log.debug("replyText: {}", returned.getReplyText());
-            }
+        rabbitTemplate.setReturnsCallback(returned -> {
+            log.error("触发return callback,");
+            log.debug("exchange: {}", returned.getExchange());
+            log.debug("routingKey: {}", returned.getRoutingKey());
+            log.debug("message: {}", returned.getMessage());
+            log.debug("replyCode: {}", returned.getReplyCode());
+            log.debug("replyText: {}", returned.getReplyText());
         });
     }
 

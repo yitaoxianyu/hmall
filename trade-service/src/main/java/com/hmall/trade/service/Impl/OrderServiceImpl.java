@@ -125,6 +125,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 4.扣减库存
         try {
             itemClient.deductStock(detailDTOS);
+            //这里可能会导致用户一直不支付,导致订单迟迟没有释放,解决方法:设置延迟消息放入死信队列来解决
         } catch (Exception e) {
             throw new RuntimeException("库存不足！");
         }
