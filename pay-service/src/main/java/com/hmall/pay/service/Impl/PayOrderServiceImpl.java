@@ -18,10 +18,14 @@ import com.hmall.pay.service.IPayOrderService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * <p>
@@ -76,6 +80,23 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         //id : po.getPayOrderNo()
         //标记订单成功了
         try{
+            CorrelationData cd = new CorrelationData(UUID.randomUUID().toString());
+            cd.getFuture().addCallback(new ListenableFutureCallback<CorrelationData.Confirm>() {
+                @Override
+                public void onFailure(Throwable ex) {
+                    log.error("send message fail", ex);
+                }
+
+                @Override
+                public void onSuccess(CorrelationData.Confirm result) {
+                    if(result.isAck()){
+                        log.debug("发送消息成功，收到 ack!");
+                    }else{
+                        log.error("发送消息失败，收到 nack, reason : {}", result.getReason());
+                    }
+                }
+            });
+
             rabbitTemplate.convertAndSend("pay.topic","pay.success",po.getPayOrderNo());
         }catch (Exception e) {
             log.info("订单支付失败,{}",e.getMessage());

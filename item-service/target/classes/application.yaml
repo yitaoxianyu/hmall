@@ -23,4 +23,4 @@ hm:
     pw: 123
   swagger:
     title: "黑马商城商品服务接口文档"
-    package: com.hmall.cart.controller
+    package: com.hmall.item.controller

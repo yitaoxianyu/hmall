@@ -67,7 +67,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Map<Long, Integer> itemNumMap = detailDTOS.stream()
                 .collect(Collectors.toMap(OrderDetailDTO::getItemId, OrderDetailDTO::getNum));
         Set<Long> itemIds = itemNumMap.keySet();
-        // 1.3.查询商品
+        // 1.   3.查询商品
         List<ItemDTO> items = itemClient.queryItemByIds(itemIds);
         if (items == null || items.size() < itemIds.size()) {
             throw new BadRequestException("商品不存在");
@@ -90,13 +90,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         detailService.saveBatch(details);
 
 
-        //这里设置了消息发送之后的返回动作
+        //这里设置了消息发送之后的返回动作,这里相当于消息发送之后,根据是否发送成功给了一个返回值
         CorrelationData cd = new CorrelationData(UUID.randomUUID().toString());
         cd.getFuture().addCallback(new ListenableFutureCallback<CorrelationData.Confirm>() {
             @Override
             public void onFailure(Throwable ex) {
                 // 2.1.Future发生异常时的处理逻辑，基本不会触发
-                log.error("send message fail", ex);
+                    log.error("send message fail", ex);
             }
             @Override
             public void onSuccess(CorrelationData.Confirm result) {

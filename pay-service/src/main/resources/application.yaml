@@ -7,6 +7,19 @@ spring:
       transport:
         dashboard: localhost:8090
       http-method-specify: true
+  rabbitmq:
+    connection-timeout: 1s
+    template:
+      retry:
+        enabled: true
+        initial-interval: 1000ms
+        multiplier: 1
+        max-attempts: 3
+
+    #这个用来设置生产者确认的消息
+    publisher-confirm-type: correlated
+    #这个用来设置发送消息的返回值
+    publisher-returns: true
 
 hm:
   db:

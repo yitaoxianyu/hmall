@@ -1,23 +1,18 @@
-package com.hmall.trade.config;
+package com.hmall.pay.config;
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.ReturnedMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.retry.MessageRecoverer;
-import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 
+@Configuration
 @RequiredArgsConstructor
 @Slf4j
-@Configuration
 public class MqConfig {
-
-    // 这里实现了生产者确认机制
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -34,11 +29,6 @@ public class MqConfig {
                 log.debug("replyText: {}", returned.getReplyText());
             }
         });
-    }
-
-    @Bean
-    public MessageRecoverer messageRecoverer(){
-        return new RepublishMessageRecoverer(rabbitTemplate,"error.direct","error");
     }
 
 }
