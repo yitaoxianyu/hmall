@@ -1,5 +1,6 @@
 package com.hmall.trade.service.Impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmall.api.client.CartClient;
 import com.hmall.api.client.ItemClient;
@@ -16,8 +17,10 @@ import com.hmall.trade.service.IOrderDetailService;
 import com.hmall.trade.service.IOrderService;
 import io.seata.spring.annotation.GlobalTransactionScanner;
 import io.seata.spring.annotation.GlobalTransactional;
+import kotlin.jvm.internal.Lambda;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.K;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Correlation;
 import org.springframework.amqp.core.Message;
@@ -129,6 +132,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         } catch (Exception e) {
             throw new RuntimeException("库存不足！");
         }
+        //5.发送延迟消息,主动获取订单状态
+
         return order.getId();
     }
 
@@ -140,6 +145,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setPayTime(LocalDateTime.now());
         updateById(order);
     }
+
 
     private List<OrderDetail> buildDetails(Long orderId, List<ItemDTO> items, Map<Long, Integer> numMap) {
         List<OrderDetail> details = new ArrayList<>(items.size());
@@ -155,5 +161,22 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             details.add(detail);
         }
         return details;
+    }
+
+    @Override
+    public void cancelOrder(Long orderId){
+        //幂等性校验,这里消费者宕机了,可能会导致多次修改订单状态
+        Order order = getById(orderId);
+        if(order == null && order.getStatus() != 5){
+            order.setStatus(5);
+            save(order);
+        }
+
+        //恢复库存
+        List<OrderDetail> details = detailService.lambdaQuery().eq(OrderDetail::getOrderId, orderId).list();
+
+        List<OrderDetailDTO> orderDetailDTOList = BeanUtil.copyToList(details, OrderDetailDTO.class);
+       itemClient.restoreStocks(orderDetailDTOList);
+
     }
 }

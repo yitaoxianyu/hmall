@@ -16,6 +16,10 @@ public interface ItemClient {
     @GetMapping("/items")
     List<ItemDTO> queryItemByIds(@RequestParam(value = "ids")Collection<Long> ids);
 
+    //扣减库存
     @PutMapping("/items/stock/deduct")
     void deductStock(@RequestBody Collection<OrderDetailDTO> items);
+
+    @PutMapping("/items/stock/restore")
+    void restoreStocks(List<OrderDetailDTO> orderDetailDTOS);
 }
